@@ -2,7 +2,9 @@ var path = require('path');
 var argv = require('yargs').argv;
 var gulp = require('gulp');
 var sass = require('gulp-sass');
+var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var createComp = require('create-component');
 var nunjucksRender = require('gulp-nunjucks-render');
@@ -26,6 +28,41 @@ gulp.task('merge-css', function() {
   gulp.src(scssFiles)
     .pipe(concat(targetCssFileName))
     .pipe(sass())
+    .pipe(gulp.dest(sourceDir));
+});
+
+/**
+ * @type gulp-task
+ *
+ * @name minify-css
+ *
+ * @description
+ * 最小化css文件
+ */
+gulp.task('minify-css', function() {
+  gulp.src(path.join(sourceDir, 'main.css'))
+    .pipe(minifyCss({keepBreaks: true}))
+    .pipe(rename(function(path) {
+      path.basename = 'main.min';
+    }))
+    .pipe(gulp.dest(sourceDir));
+});
+
+/**
+ * @type gulp-task
+ *
+ * @name uglify-js
+ *
+ * @description
+ * 最小化js文件
+ */
+gulp.task('uglify-js', function() {
+  var jsPath = path.join(sourceDir, 'main.js');
+  gulp.src(jsPath)
+    .pipe(uglify())
+    .pipe(rename(function(path) {
+      path.basename = 'main.min';
+    }))
     .pipe(gulp.dest(sourceDir));
 });
 
@@ -98,8 +135,12 @@ gulp.task('component', function() {
   ], compPath);
 });
 
+gulp.task('minify', ['uglify-js', 'minify-css'], function() {
+
+});
+
 // 默认任务
-gulp.task('default', ['merge-js', 'merge-css', 'merge-html'], function() {
+gulp.task('default', ['merge-js', 'merge-css', 'merge-html', 'minify'], function() {
   gulp.watch([scssFiles], ['merge-css']);
   gulp.watch([jsFiles], ['merge-js']);
   gulp.watch([htmlFiles], ['merge-html']);

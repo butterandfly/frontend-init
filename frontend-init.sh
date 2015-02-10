@@ -16,6 +16,8 @@ npm install --save-dev gulp-sass
 npm install --save-dev gulp-util
 npm install --save-dev gulp-rename
 npm install --save-dev gulp-nunjucks-render
+npm install --save-dev gulp-minify-css
+npm install --save-dev gulp-uglify
 npm install --save-dev yargs
 
 npm install --save-dev create-component
